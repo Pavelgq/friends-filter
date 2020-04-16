@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фильтр друзей VK</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://vk.com/js/api/openapi.js?167" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+</head>
+
+<body>
+
+    <main>
+        <h1 class="logo">Другофильтр</h1>
+        <div class="window">
+            <div class="window-title">
+                <h2>Выберите друзей</h2>
+            </div>
+            <div class="window-col">
+                <div class="filters">
+                    <div class="field-wrapper">
+                        <input type="text" class="field find-from-all" name="find-from-all"
+                            placeholder="Начните вводить имя друга" />
+                        <i class="fa fa-search"></i>
+                    </div>
+                </div>
+                <div class="col-title">
+                    <h3>Ваши друзья</h3>
+                </div>
+                <ul class="list list-of-all">
+                    <!-- ЗДЕСЬ ДРУГИ -->
+                    <script id="user-template" type="text/x-handlebars-template">
+                        {{#each items}}
+                        <li draggable>
+                            <div class="img-wrapper"><img src="{{photo_50}}" alt="" srcset=""></div>
+                            <i>{{first_name}} {{last_name}}</i>
+                        </li>
+                        {{/each}}
+                    </script>  
+                </ul>
+            </div>
+            <div class="window-col">
+                <div class="filters">
+                    <div class="field-wrapper">
+                        <input type="text" class="field find-from-selected" name="find-from-list"
+                            placeholder="Начните вводить имя друга" />
+                        <i class="fa fa-search"></i>
+                    </div>
+                </div>
+                <div class="col-title">
+                    <h3>Друзья в списке</h3>
+                </div>
+                <ul class="list list-of-selected">
+                    <!-- ЗДЕСЬ ДРУГИ -->
+                </ul>
+            </div>
+            <div class="window-action">
+                <button type="button" class="btn save">Сохранить</button>
+            </div>
+        </div>
+    </main>
+
+    <template id="li-template" style="display:none;">
+        <li draggable="true">
+            <div class="img-wrapper">
+                <img src="#" alt="" />
+            </div>
+            <div class="name"></div>
+            <i class="fa fa-plus fa-times"></i>
+        </li>
+    </template>
+
+
+   
+    
+    <script src="action.js"></script>
+
+</body>
+
+</html>
