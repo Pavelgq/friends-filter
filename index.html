@@ -6,78 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фильтр друзей VK</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="src/style.css">
     <script src="https://vk.com/js/api/openapi.js?167" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 </head>
 
 <body>
 
-    <main>
-        <h1 class="logo">Другофильтр</h1>
-        <div class="window">
-            <div class="window-title">
+    <main class="page-main">
+        <h1 class="visually-hidden">ДругоФильтр</h1>
+        <section class="module">
+            <div class="module__title">
                 <h2>Выберите друзей</h2>
             </div>
-            <div class="window-col">
-                <div class="filters">
-                    <div class="field-wrapper">
-                        <input type="text" class="field find-from-all" name="find-from-all"
-                            placeholder="Начните вводить имя друга" />
-                        <i class="fa fa-search"></i>
+            <div class="module__col">
+                <div class="module__filters">
+                    <div class="module__wrapper filter">
+                        <input type="text" name="find-from-all" class="filter__field filter__fueld--all" placeholder="Начните вводить имя друга" />
+                        <span class="filter__search icon"></span>
                     </div>
                 </div>
-                <div class="col-title">
+                <div class="module__col-title">
                     <h3>Ваши друзья</h3>
                 </div>
-                <ul class="list list-of-all">
-                    <!-- ЗДЕСЬ ДРУГИ -->
-                    <script id="user-template" type="text/x-handlebars-template">
+                <ul class="module__list module__list--all">
+                    <script class="module__friends" type="text/x-handlebars-template">
                         {{#each items}}
-                        <li draggable>
-                            <div class="img-wrapper"><img src="{{photo_50}}" alt="" srcset=""></div>
-                            <i>{{first_name}} {{last_name}}</i>
+                        <li class="item js-card" draggable="true">
+                            <div class="item__wrapper"><img class="item__image" src="{{photo_50}}" alt="" srcset=""></div>
+                            <div class="item__name">{{first_name}} {{last_name}}</div>
+                            <span class="item__button add-button icon"></span>
                         </li>
                         {{/each}}
-                    </script>  
+                    </script>
                 </ul>
             </div>
-            <div class="window-col">
-                <div class="filters">
-                    <div class="field-wrapper">
-                        <input type="text" class="field find-from-selected" name="find-from-list"
-                            placeholder="Начните вводить имя друга" />
-                        <i class="fa fa-search"></i>
+            
+            <div class="module__col">
+                <div class="module__filters">
+                    <div class="module__wrapper filter">
+                        <input type="text" name="find-from-all" class="filter__field filter__fueld--selected" placeholder="Начните вводить имя друга" />
+                        <span class="filter__search icon"></span>
                     </div>
                 </div>
-                <div class="col-title">
+                <div class="module__col-title">
                     <h3>Друзья в списке</h3>
                 </div>
-                <ul class="list list-of-selected">
-                    <!-- ЗДЕСЬ ДРУГИ -->
+                <ul class="module__list module__list--selected">
+                   
                 </ul>
             </div>
-            <div class="window-action">
-                <button type="button" class="btn save">Сохранить</button>
+            <div class="module__action">
+                <button type="button" class="module__button save-button">Сохранить</button>
             </div>
-        </div>
+        </section>
+
     </main>
 
-    <template id="li-template" style="display:none;">
-        <li draggable="true">
-            <div class="img-wrapper">
-                <img src="#" alt="" />
-            </div>
-            <div class="name"></div>
-            <i class="fa fa-plus fa-times"></i>
-        </li>
-    </template>
-
-
-   
-    
-    <script src="action.js"></script>
-
+    <script src="src/action.js"></script>
 </body>
-
 </html>

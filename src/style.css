@@ -33,18 +33,25 @@ main {
     align-content: center;
 }
 
-.logo {
-    display: block;
-    width: 102px;
-    height: 24px;
-    margin: 0 auto 21px;
+.visually-hidden:not(:focus):not(:active),
+input[type="checkbox"].visually-hidden,
+input[type="radio"].visually-hidden {
+  position: absolute;
 
-    font-size: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
 
-    background: url("../img/logo.png") no-repeat center transparent;
+  white-space: nowrap;
+
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
 }
 
-.window {
+.module {
     display: flex;
     overflow: hidden;
     flex-direction: row;
@@ -56,11 +63,11 @@ main {
     flex-wrap: wrap;
 }
 
-.window > * {
+.module > * {
     padding: 0 15px;
 }
 
-.window-title {
+.module__title {
     width: 100%;
     padding-top: 13px;
     padding-bottom: 13px;
@@ -68,18 +75,18 @@ main {
     background: #ff8663;
 }
 
-.window-title * {
+.module__title * {
     color: white;
 }
 
-.window-title h2 {
+.module__title h2 {
     margin: 0;
 
     font-size: 16px;
     line-height: 1.2;
 }
 
-.window-action {
+.module__action {
     display: flex;
     width: 100%;
     padding-top: 8px;
@@ -90,7 +97,7 @@ main {
     justify-content: flex-end;
 }
 
-.window-col {
+.module__col {
     width: 50%;
     padding: 0;
 
@@ -98,17 +105,17 @@ main {
     background: white;
 }
 
-.window-col > * {
+.module__col > * {
     padding: 0 15px;
 }
 
-.filters {
+.module__filters {
     display: flex;
 
     background: #f0f0f0;
 }
 
-.btn {
+.module__button {
     padding: 9px 15px;
 
     font-size: 12px;
@@ -125,15 +132,15 @@ main {
     background: #ff8663;
 }
 
-.btn:focus {
+.module__button:focus {
     outline: none;
 }
 
-.btn:hover {
+.module__button:hover {
     background: #ff9a61;
 }
 
-.field {
+.filter__field {
     width: 100%;
     padding: 4px 8px 4px;
 
@@ -148,27 +155,27 @@ main {
             border-radius: 20px;
 }
 
-.field:focus {
+.filter__field:focus {
     outline: none;
     box-shadow: 0 0 2px 1px #ff9a61;
 }
 
-.field:focus + i {
+.filter__field:focus + .filter__search {
     color: #ff9a61;
 }
 
-.save {
+.module__button .save-button {
     margin-right: -8px;
 }
 
-.field-wrapper {
+.module__wrapper {
     position: relative;
 
     width: 100%;
     margin: 10px 0 8px;
 }
 
-.field-wrapper i {
+.field .filter__search {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -179,25 +186,25 @@ main {
     line-height: 26px;
 }
 
-.fa {
+.icon {
     transition: .2s ease-out;
 
     color: #9f9f9f;
 }
 
-.filters .field {
+.module__filters .filter__field {
     padding-left: 30px;
 }
 
-.window-col:nth-child(2) .filters {
+.module-col:nth-child(2) .module__filters {
     padding-right: 8px;
 }
 
-.window-col:nth-child(3) .filters {
+.module-col:nth-child(3) .module__filters {
     padding-left: 8px;
 }
 
-.col-title {
+.module__col-title {
     display: flex;
     padding: 15px 0 8px;
     margin: 0 15px;
@@ -205,13 +212,14 @@ main {
     border-bottom: 1px solid #f0f0f0;
 }
 
-.col-title h3 {
+.module__col-title h3 {
     margin: 0;
 
     font-size: 12px;
 }
 
-.list {
+
+.module__list {
     height: 350px;
     margin: 0;
     overflow-y: auto;
@@ -219,7 +227,7 @@ main {
     list-style-type: none;
 }
 
-.list li {
+.module__list li {
     display: flex;
     padding-top: 8px;
     padding-bottom: 9px;
@@ -234,7 +242,7 @@ main {
     align-items: center;
 }
 
-.list i {
+.module__list .item__button {
     margin-right: 8px;
     margin-left: auto;
 
@@ -245,11 +253,11 @@ main {
     flex-shrink: 0;
 }
 
-.list i:hover {
+.module__list .item__button:hover {
     color: #4f4f4f;
 }
 
-.list .img-wrapper {
+.module__list .item__wrapper {
     width: 45px;
     height: 45px;
     margin-right: 8px;
@@ -262,13 +270,13 @@ main {
     flex-shrink: 0;
 }
 
-.img-wrapper img {
+.item__wrapper .item__image {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.list .name {
+.module__list .item__name {
     padding-right: 15px;
     margin-right: auto;
     margin-left: 0;
@@ -276,11 +284,11 @@ main {
     line-height: 1.2;
 }
 
-.window-col:nth-child(2) {
+.module-col:nth-child(2) {
     border-left: 1px solid #f0f0f0;
 }
 
-.list li:hover {
+.module__list li:hover {
     background: #f0f0f0;
 }
 
@@ -303,3 +311,4 @@ main {
     cursor:    -moz-grabbing;
     cursor: -webkit-grabbing;
 }
+

@@ -2,14 +2,49 @@
 
 
 
-const listOfAll = document.querySelector('.list-of-all');
-const listOfSecected = document.querySelector('.list-of-selected');
+const listOfAll = document.querySelector('.module__list--all');
+const listOfSecected = document.querySelector('.module__list--selected');
+
+
+//Drug&Drop
+
+// listOfAll.addEventListener('mousedown', (e) => {
+//     dragAndDrop(e.target);
+    
+
+// });
+
+
+const dragAndDrop = () => {
+    const item = document.querySelector(".js-card");
+    const dropPlace = document.querySelectorAll('.module__list');
+
+    const dragStart = function () {
+        setTimeout(() => {
+            item.classList.add('visually-hidden');
+        }, 0);
+    };
+
+    const dragEnd = function () {
+        setTimeout(() => {
+            item.classList.remove('visually-hidden');
+        }, 0);
+    };
+
+    item.addEventListener('dragstart', dragStart);
+    item.addEventListener('dragend', dragEnd);
+}
+
+
+
+
 
 //API VK 
 
 VK.init({
     apiId: 7414392
 });
+
 
 function auth() {
     
@@ -24,11 +59,11 @@ function auth() {
     });
 
 }
-
-// auth().then(() => {
-//     VK.api('users.get', {fields: 'photo_50', name_case: 'gen'}, (response)=> console.log('Успех', response));
-// });
-
+/**
+ * Вызов VK API
+ * @param {string} method
+ * @param {Object} params   
+ */
 function callAPI(method, params) {
     return new Promise((resolve, reject) => {
         VK.api(method, params, (data) => {
@@ -49,7 +84,7 @@ function callAPI(method, params) {
         v: 5.103
     });
 
-    const headerInfo = document.querySelector('.window-title > h2');
+    const headerInfo = document.querySelector('.module__title > h2');
 
     headerInfo.textContent = `Выберите друзей ${me.first_name} ${me.last_name}`;
 
@@ -59,21 +94,20 @@ function callAPI(method, params) {
         v: 5.103
     });
    
-    const template = document.querySelector('#user-template').textContent;
+    const template = document.querySelector('.module__friends').textContent;
     const render = Handlebars.compile(template);
     const htmlFriend = render(friends);
     listOfAll.innerHTML = htmlFriend;
+    
+    
     console.log(htmlFriend);
 })();
 
+if (document.querySelector('.js-card') !== 'undefined') {
+    dragAndDrop();
+}
 
 
 
 
-// const template = document.querySelector('#user-template').textContent;
 
-//     const render = Handlebars.compile(template);
-
-//     const htmlFriend = render(friends);
-
-//     listOfAll.innerHTML = htmlFriend;
