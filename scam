@@ -1,0 +1,59 @@
+
+const dragAndDrop = () => {
+    let item;
+
+    const enterElement = function (e) {
+        if (e.target.tagName === 'LI') {
+            item = e.target;
+        }
+    };
+
+    const dropPlace = document.querySelectorAll('.module__list');
+
+    const dragStart = function () {
+        this.classList.add('hold');
+
+        setTimeout(() => {
+            this.classList.add('hide');
+        }, 0);
+    };
+
+    const dragEnd = function () {
+        this.classList.remove('hide');
+        this.classList.remove('hold');
+    };
+
+    const dragOver = function (evt) {
+        evt.preventDefault();
+        this.classList.add('over');
+    };
+
+    const dragEnter = function (evt) {
+        evt.preventDefault();
+        this.classList.add('hovered');
+
+    };
+
+    const dragLeave = function () {
+
+        this.classList.remove('hovered');
+    };
+
+    const dragDrop = function () {
+        console.log(this);
+        this.append(item);
+        this.classList.remove('hovered');
+
+    };
+
+    dropPlace.forEach(cell => {
+        cell.addEventListener('mousedown', enterElement);
+        cell.addEventListener('dragover', dragOver);
+        cell.addEventListener('dragenter', dragEnter);
+        cell.addEventListener('dragleave', dragLeave);
+        cell.addEventListener('drop', dragDrop);
+    });
+
+    item.addEventListener('dragstart', dragStart);
+    item.addEventListener('dragend', dragEnd);
+}

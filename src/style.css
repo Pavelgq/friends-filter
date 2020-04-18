@@ -220,6 +220,7 @@ input[type="radio"].visually-hidden {
 
 
 .module__list {
+    position: relative;
     height: 350px;
     margin: 0;
     overflow-y: auto;
@@ -227,7 +228,7 @@ input[type="radio"].visually-hidden {
     list-style-type: none;
 }
 
-.module__list li {
+.item {
     display: flex;
     padding-top: 8px;
     padding-bottom: 9px;
@@ -235,14 +236,14 @@ input[type="radio"].visually-hidden {
 
     font-size: 12px;
 
-    transition: .2s ease-out;
+    /* transition: .2s ease-out; */
 
     border-bottom: 1px solid #f0f0f0;
 
     align-items: center;
 }
 
-.module__list .item__button {
+.item__button {
     margin-right: 8px;
     margin-left: auto;
 
@@ -253,11 +254,11 @@ input[type="radio"].visually-hidden {
     flex-shrink: 0;
 }
 
-.module__list .item__button:hover {
+.item__button:hover {
     color: #4f4f4f;
 }
 
-.module__list .item__wrapper {
+.item__wrapper {
     width: 45px;
     height: 45px;
     margin-right: 8px;
@@ -270,13 +271,13 @@ input[type="radio"].visually-hidden {
     flex-shrink: 0;
 }
 
-.item__wrapper .item__image {
+.item__image {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.module__list .item__name {
+.item__name {
     padding-right: 15px;
     margin-right: auto;
     margin-left: 0;
@@ -310,5 +311,22 @@ input[type="radio"].visually-hidden {
     cursor:         grabbing;
     cursor:    -moz-grabbing;
     cursor: -webkit-grabbing;
+} 
+
+.over {
+    
+    border: solid 1px #ccc;
 }
 
+.hold {
+    border: solid 1px #ccc;
+}
+
+.hide {
+    display: none;
+    position: absolute;
+}
+
+.hovered {
+    background-color: #f00;
+}
