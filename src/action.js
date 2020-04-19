@@ -3,76 +3,112 @@
 
 
 const listOfAll = document.querySelector('.module__list--all');
-const listOfSecected = document.querySelector('.module__list--selected');
+
+const listDrop = document.querySelectorAll('.module__list');
 
 
 //Drug&Drop
-var DragManager = new function () {
+const DragManager = new function () {
 
     var dragItem = {};
 
     var self = this;
-    console.log(self)
 
-    function onMouseDown(e) {
-        if (e.which != 1) {
-            return;
+    /**
+     * Функция начала переноса элемента
+     * @param {Object} event
+     */
+    function onDragStart(event) {
+       
+        if (event.which != 1) {
+            return
         }
 
-        var item = e.target.closest('.js-card');
+        let item = event.target.closest('.js-card');
 
-        if (!item) {
-            return;
-        }
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('Text', item.textContent); //???
 
         dragItem.item = item;
 
-        dragItem.downX = e.pageX;
-        dragItem.downY = e.pageY;
-    };
+        dragItem.downX = event.pageX;
+        dragItem.downY = event.pageY;
 
-    function onMouseMove(e) {
-        if (!dragItem.item) {
-            return;
-        }
+        dragItem.avatar = item.cloneNode(true);
 
-        if (!dragItem.avatar) {
+        console.log('  ', event)
 
-            var moveX = e.pageX - dragItem.downX;
-            var moveY = e.pageY - dragItem.downY;
-            console.log(moveX, moveY);
+        listDrop.forEach((list) => {
+            // list.ondragenter = onDragEnter;
+            // list.ondragleave = onDragLeave;
+            list.ondragover = onDragOver;
+            list.ondragend = onDragEnd;
+        });
 
-            if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
-                return;
-            }
 
-            dragItem.avatar = createAvatar(e);
+        setTimeout(function () {
+            
+            // Если выполнить данное действие без setTimeout, то
+            // перетаскиваемый объект, будет иметь этот класс.
+            dragItem.item.innerHTML = '';
+            console.log(dragItem);
+            dragItem.item.classList.add('js-card--empty');
 
-            if (!dragItem.avatar) {
-                dragItem = {};
-                return;
-            }
-            console.log('move', dragItem.avatar);
-            var coords = getCoords(dragItem.avatar);
-            dragItem.shiftX = dragItem.downX - coords.left;
-            dragItem.shiftY = dragItem.downY - coords.top;
-
-            startDrag(e); // отобразить начало переноса
-        }
-
-        // отобразить перенос объекта при каждом движении мыши
-        dragItem.avatar.style.left = e.pageX - dragItem.shiftX + 'px';
-        dragItem.avatar.style.top = e.pageY - dragItem.shiftY + 'px';
-        return false;
+        }, 0);
     }
 
-    function onMouseUp(e) {
-        if (dragItem.avatar) {
-            finishDrag(e);
+    /**
+     * Функция вызывается, когда
+     * @param {Object} event
+     */
+    function onDragOver(event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        var target = event.target;
+        if (target && target !== dragItem.item && target.nodeName == 'LI') {
+            // Сортируем
+            listOfAll.insertBefore(dragItem.item,target);
+
         }
-        dragItem = {};
     }
 
+    /**
+     * 
+     * @param {Object} event 
+     */
+    function onDragEnter(e) {
+        console.log('enter');
+    }
+
+    /**
+     * 
+     * @param {Object} event 
+     */
+    function onDragLeave {
+        console.log('leave');
+    }
+
+
+    /**
+     * Функция вызывается, когда
+     * @param {Object} event
+     */
+    function onDragEnd(event) {
+        event.preventDefault();
+
+        dragItem.item.innerHTML = dragItem.avatar.innerHTML;
+        dragItem.item.classList.remove('js-card--empty');
+
+        listDrop.forEach((list) => {
+            list.removeEventListener('dragover', onDragOver, false);
+            list.removeEventListener('dragend', onDragEnd, false);
+        });
+
+        console.log(dragItem.item);
+    }
+    /**
+     * Создает отображение переносимого объекта 
+     */
     function createAvatar() {
 
         var avatar = dragItem.item;
@@ -84,7 +120,6 @@ var DragManager = new function () {
             top: avatar.top || '',
             zIndex: avatar.zIndex || ''
         };
-        console.log('Avatar', avatar);
         avatar.rollback = function () {
             old.parent.insertBefore(avatar, old.nextSibling);
             avatar.style.position = old.position;
@@ -92,62 +127,17 @@ var DragManager = new function () {
             avatar.style.top = old.top;
             avatar.style.zIndex = old.zIndex;
         };
-        console.log('Avatar', avatar);
         return avatar;
     }
 
-    function startDrag(e) {
-        var avatar = dragItem.avatar;
-
-        document.body.appendChild(avatar);
-        avatar.style.zIndex = 9999;
-        avatar.style.position = 'absolute';
-    }
-
-    function finishDrag(e) {
-
-        var dropElem = findDroppable(e);
-
-
-        if (!dropElem) {
-            dragItem.avatar.rollback();
-            self.onDragCancel(dragItem);
-            console.log('я тут');
-        } else {
-            
-            console.log('или тут', self);
-            self.onDragEnd(dragItem, dropElem);
-        }
-
-    }
-
-    function findDroppable(event) {
-
-        dragItem.item.hidden = true;
-
-        var elem = document.elementFromPoint(event.clientX, event.clientY);
-
-        console.log('Drop', elem);
-
-        dragItem.item.hidden = false;
-
-        if (elem == null) {
-            return null;
-        }
-
-        console.log('Drop', elem.closest('.module__list'));
-        return elem.closest('.module__list');
-    }
-    document.onmousemove = onMouseMove;
-    document.onmouseup = onMouseUp;
-    document.onmousedown = onMouseDown;
-
-    this.onDragEnd = function (dragItem, dropElem) {
-        document.body.removeChild(dragItem.avatar);
-        dragItem.item.style = 'none';
-        dropElem.appendChild(dragItem.item);
-    };
-    this.onDragCancel = function (dragItem) {};
+    listDrop.forEach((list) => {
+        list.addEventListener('mousedown', () => {
+            let item = event.target.closest('.js-card');
+        
+            item.addEventListener('dragstart', onDragStart, false);
+        },true);    
+    });
+    
 
 }
 
