@@ -39,10 +39,11 @@ const DragManager = new function () {
         console.log('  ', event)
 
         listDrop.forEach((list) => {
-            // list.ondragenter = onDragEnter;
-            // list.ondragleave = onDragLeave;
+            list.ondragenter = onDragEnter;
+            list.ondragleave = onDragLeave;
             list.ondragover = onDragOver;
             list.ondragend = onDragEnd;
+            list.ondrop = onDrop;
         });
 
 
@@ -67,8 +68,10 @@ const DragManager = new function () {
         var target = event.target;
         if (target && target !== dragItem.item && target.nodeName == 'LI') {
             // Сортируем
-            listOfAll.insertBefore(dragItem.item,target);
+            this.insertBefore(dragItem.item,target);
 
+        }else if (target.nodeName == 'UL') {
+            this.appendChild(dragItem.item);
         }
     }
 
@@ -84,7 +87,7 @@ const DragManager = new function () {
      * 
      * @param {Object} event 
      */
-    function onDragLeave {
+    function onDragLeave(event) {
         console.log('leave');
     }
 
@@ -101,41 +104,23 @@ const DragManager = new function () {
 
         listDrop.forEach((list) => {
             list.removeEventListener('dragover', onDragOver, false);
+            
             list.removeEventListener('dragend', onDragEnd, false);
         });
 
         console.log(dragItem.item);
     }
+   
     /**
-     * Создает отображение переносимого объекта 
+     * 
      */
-    function createAvatar() {
-
-        var avatar = dragItem.item;
-        var old = {
-            parent: avatar.parentNode,
-            nextSibling: avatar.nextSibling,
-            position: avatar.position || '',
-            left: avatar.left || '',
-            top: avatar.top || '',
-            zIndex: avatar.zIndex || ''
-        };
-        avatar.rollback = function () {
-            old.parent.insertBefore(avatar, old.nextSibling);
-            avatar.style.position = old.position;
-            avatar.style.left = old.left;
-            avatar.style.top = old.top;
-            avatar.style.zIndex = old.zIndex;
-        };
-        return avatar;
+    function onDrop(event) {
+        console.log(event);
+        // event.target.appendChild(dragItem.item);
     }
 
     listDrop.forEach((list) => {
-        list.addEventListener('mousedown', () => {
-            let item = event.target.closest('.js-card');
-        
-            item.addEventListener('dragstart', onDragStart, false);
-        },true);    
+        list.addEventListener('dragstart', onDragStart, false);
     });
     
 
