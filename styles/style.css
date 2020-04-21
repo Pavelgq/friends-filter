@@ -233,6 +233,7 @@ input[type="radio"].visually-hidden {
 }
 
 .item {
+    position: relative;
     display: flex;
     padding-top: 8px;
     padding-bottom: 9px;
@@ -319,30 +320,68 @@ input[type="radio"].visually-hidden {
 
 } 
 
-.over {
-    
-    border: solid 1px #ccc;
-}
-
-.hold {
-    border: solid 1px #ccc;
-}
-
-.hide {
-    display: none;
-    position: absolute;
-}
-
-.hovered {
-    background-color: #f00;
-}
-
 .js-card--empty {
     height: 61px;
     border: 3px dotted #00000020;
     border-radius: 5px;
 }
 
-.ghost {
-    opacity: .4;
+.module__list--all .item__button::before {
+    content: '';
+    position: absolute;
+    top:30px;
+    right: 20px;
+
+    width: 15px;
+    height: 3px;
+
+    background-color: #d2d2d2;
+
+}
+
+.module__list--all .item__button::after {
+    content: '';
+    position: absolute;
+    top: 24px;
+    right: 26px;
+
+    width: 3px;
+    height: 15px;
+
+    background-color: #d2d2d2;
+
+}
+
+.module__list--selected .item__button::before {
+    content: '';
+    position: absolute;
+    top:30px;
+    right: 20px;
+
+    width: 15px;
+    height: 3px;
+
+    background-color: #d2d2d2;
+    transform:rotate(45deg);
+    transition: 0.4s ease-in;
+}
+
+.module__list--selected .item__button::after {
+    content: '';
+    position: absolute;
+    top: 24px;
+    right: 26px;
+
+    width: 3px;
+    height: 15px;
+
+    background-color: #d2d2d2;
+
+    transform:rotate(45deg);
+    
+}
+
+.item__button:hover:before,
+.item__button:hover::after{
+    background-color: #dadada;
 }

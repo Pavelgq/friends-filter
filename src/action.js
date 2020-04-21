@@ -3,7 +3,7 @@
 
 
 const listOfAll = document.querySelector('.module__list--all');
-
+const listOfSelected = document.querySelector('.module__list--selected');
 const listDrop = document.querySelectorAll('.module__list');
 
 
@@ -15,13 +15,14 @@ const DragManager = new function () {
     var self = this;
 
     /**
-     * Функция начала переноса элемента
+     * Функция находит переносимый элемент и запускает обработчики событий для контейнеров
+     * куда требуется этот элемент добавить 
      * @param {Object} event
      */
     function onDragStart(event) {
        
         if (event.which != 1) {
-            return
+            return;
         }
 
         let item = event.target.closest('.js-card');
@@ -36,30 +37,20 @@ const DragManager = new function () {
 
         dragItem.avatar = item.cloneNode(true);
 
-        console.log('  ', event)
-
         listDrop.forEach((list) => {
-            list.ondragenter = onDragEnter;
-            list.ondragleave = onDragLeave;
             list.ondragover = onDragOver;
             list.ondragend = onDragEnd;
-            list.ondrop = onDrop;
         });
 
-
         setTimeout(function () {
-            
-            // Если выполнить данное действие без setTimeout, то
-            // перетаскиваемый объект, будет иметь этот класс.
             dragItem.item.innerHTML = '';
-            console.log(dragItem);
             dragItem.item.classList.add('js-card--empty');
 
         }, 0);
     }
 
     /**
-     * Функция вызывается, когда
+     * Функция определяет место вставки drag элемента между соседями 
      * @param {Object} event
      */
     function onDragOver(event) {
@@ -76,24 +67,7 @@ const DragManager = new function () {
     }
 
     /**
-     * 
-     * @param {Object} event 
-     */
-    function onDragEnter(e) {
-        console.log('enter');
-    }
-
-    /**
-     * 
-     * @param {Object} event 
-     */
-    function onDragLeave(event) {
-        console.log('leave');
-    }
-
-
-    /**
-     * Функция вызывается, когда
+     * Функция добавляет drag елементу содержимое для отображения его в месте drop'а
      * @param {Object} event
      */
     function onDragEnd(event) {
@@ -102,39 +76,41 @@ const DragManager = new function () {
         dragItem.item.innerHTML = dragItem.avatar.innerHTML;
         dragItem.item.classList.remove('js-card--empty');
 
-        listDrop.forEach((list) => {
-            list.removeEventListener('dragover', onDragOver, false);
+            this.removeEventListener('dragover', onDragOver, false);
             
-            list.removeEventListener('dragend', onDragEnd, false);
-        });
-
-        console.log(dragItem.item);
-    }
-   
-    /**
-     * 
-     */
-    function onDrop(event) {
-        console.log(event);
-        // event.target.appendChild(dragItem.item);
+            this.removeEventListener('dragend', onDragEnd, false);
     }
 
     listDrop.forEach((list) => {
         list.addEventListener('dragstart', onDragStart, false);
     });
-    
+}
+
+//Добавление и удаление по кнопке на карточке
+listDrop.forEach((list) => {
+    list.onclick = changeList;
+});
+
+/**
+ * Функция обработчик события клика. Перехватывает нажатие на span
+ * ищет целевую карточку и перемещает ее в противоположное поле
+ * @param {Object} event
+ */
+function changeList(event) {
+    if (event.target.nodeName === 'SPAN') {
+        let item = event.target.closest('.js-card');
+
+        this.removeChild(item);
+
+        if (listOfAll.className == this.className) {
+            listOfSelected.appendChild(item);
+        }else {
+            listOfAll.appendChild(item);
+        }
+    }
 
 }
 
-function getCoords(elem) { // кроме IE8-
-    var box = elem.getBoundingClientRect();
-
-    return {
-        top: box.top + pageYOffset,
-        left: box.left + pageXOffset
-    };
-
-}
 //API VK 
 
 VK.init({
