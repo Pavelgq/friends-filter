@@ -400,3 +400,10 @@ input[type="radio"].visually-hidden {
 .item__button:hover::after{
     background-color: #dadada;
 }
+
+.module__button {
+    margin-right: 10px;
+}
+.module__button:last-child {
+    margin-right: 0;
+}
