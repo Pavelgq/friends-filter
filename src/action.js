@@ -7,35 +7,77 @@ const listOfSelected = document.querySelector('.module__list--selected');
 const listDrop = document.querySelectorAll('.module__list');
 const refButton = document.querySelector('.ref-button');
 const saveButton = document.querySelector('.save-button');
+const filterAll = document.querySelector('.filter__fueld--all');
+const filterSelected = document.querySelector('.filter__fueld--selected');
 
- 
-const DataModel = new function() {
-    
-    refButton.onclick = refreshFriends;
-    saveButton.onclick = saveFriends;
+let myFriends,
+    me = [];
+let myFriendsId = [];
 
-    const myFriends = JSON.parse(localStorage.myFriends);
-    console.log(myFriends);
-    const me = JSON.parse(localStorage.me);
-    let listFriends = {};
-    if (localStorage.listFriends !== '') {
-        listFriends = JSON.parse(localStorage.listFriends);
-    }
-
-    renderLists();
+renderLists();
 
     function refreshFriends() {
-        authorization();
 
-        //проверить изменения и добавить в массив измененных друзей и удалить если их нет.
+        authorization(false);
+
+        let refFriends = JSON.parse(localStorage.myFriends);
+        let refMe = JSON.parse(localStorage.me);
+
+        let refFriendsId = [];
+        refFriends.items.forEach(function (item) {
+            refFriendsId.push(item.id);
+        });
+
+        for (let i = 0; i < myFriends.items.length; i++) {
+            let index = refFriendsId.indexOf(myFriends.items[i].id);
+            if (index === -1) {
+                delete myFriends.items[i];
+            } else {
+                delete refFriends[index];
+            }
+        }
+        myFriends.items.splice(0, 0, refFriends);
+
+        localStorage.myFriends = JSON.stringify(myFriends);
     }
 
     function saveFriends() {
-        localStorage.listFriends = JSON.stringify(listFriends);
+        let newSave = [];
+        let selected = listOfSelected.children;
+        let all = listOfAll.children;
+
+
+        for (let i = 0; i < all.length; i++) {
+            let id = all[i].dataset.number;
+            let index = myFriendsId.indexOf(+id);
+            myFriends.items[index]['selected'] = null;
+            newSave.push(myFriends.items[index]);
+        }
+        for (let i = 0; i < selected.length; i++) {
+            let id = selected[i].dataset.number;
+            let index = myFriendsId.indexOf(+id);
+            myFriends.items[index]['selected'] = i;
+            newSave.push(myFriends.items[index]);
+        }
+        myFriends.items = newSave;
+
+        localStorage.myFriends = JSON.stringify(myFriends);
+
+        alert('Данные сохранены')
     }
 
     function renderLists() {
-       
+        if (localStorage.myFriends !== undefined) {
+            myFriends = JSON.parse(localStorage.myFriends);
+            me = JSON.parse(localStorage.me);
+        }else {
+            authorization(true);
+            return 0;
+        }
+
+        myFriends.items.forEach(function (item) {
+            myFriendsId.push(item.id);
+        });
 
         const headerInfo = document.querySelector('.module__title > h2');
 
@@ -43,28 +85,66 @@ const DataModel = new function() {
 
         const template = document.querySelector('.module__friends').textContent;
         const render = Handlebars.compile(template);
-        const htmlFriend = render(myFriends);
-        listOfAll.innerHTML = htmlFriend;
 
-        if (listFriends) {
-            const htmlListFriends =  render(listFriends);
-            listOfSelected.innerHTML = htmlListFriends;
+        let myFriendsSelect = {
+            items: []
+        };
+
+        let myFriendsAll = {
+            items: []
+        };
+
+        for (let i = 0; i < myFriends.items.length; i++) {
+            if (myFriends.items[i].selected !== null && myFriends.items[i].hasOwnProperty('selected')) {
+                myFriendsSelect.items[myFriends.items[i].selected] = myFriends.items[i];
+
+            } else {
+                myFriendsAll.items.push(myFriends.items[i]);
+            }
         }
-        
+
+
+        const htmlFriend = render(myFriendsAll);
+        const htmlSecected = render(myFriendsSelect);
+        listOfAll.innerHTML = htmlFriend;
+        listOfSelected.innerHTML = htmlSecected;
     }
 
+    refButton.onclick = refreshFriends;
+    saveButton.onclick = saveFriends;
+
+
+function copy(arr) {
+    if (arr.length) {
+        var arr1 = [];
+    } else if (typeof arr == "object") {
+        var arr1 = {};
+    } else {
+        return arr;
+    }
+    for (let key in arr) {
+        if (typeof arr[key] == "function" || !arr[key].length || typeof arr[key] != "object")
+            arr1[key] = arr[key];
+        else
+            arr1[key] = copy(arr[key]);
+    }
+    return arr1;
 }
 
 //API VK 
 
-function authorization() {
+/**
+ * Функция авторизации и получения данных из VK API 
+ * flag если нужно отрендерить после получения данных
+ * @param {boolean} flag
+ */
+async function authorization(flag) {
 
     VK.init({
         apiId: 7416612
     });
 
     function auth() {
-
         return new Promise((resolve, reject) => {
             VK.Auth.login(data => {
                 if (data.session) {
@@ -76,6 +156,7 @@ function authorization() {
         });
 
     }
+   
     /**
      * Вызов VK API
      * @param {string} method
@@ -85,7 +166,6 @@ function authorization() {
         return new Promise((resolve, reject) => {
             VK.api(method, params, (data) => {
                 if (data.error) {
-
                     reject(data.error);
                 } else {
                     resolve(data.response);
@@ -95,28 +175,25 @@ function authorization() {
     }
 
 
-    (async () => {
-        await auth();
-        const [me] = await callAPI('users.get', {
-            name_case: 'gen',
-            v: 5.103
-        });
+    await auth();
 
-        const friends = await callAPI('friends.get', {
-            user_id: me.id,
-            fields: 'nickname, photo_50',
-            v: 5.103
-        });
-
-        
-        
-        localStorage.myFriends = JSON.stringify(friends);  
-        if ((localStorage.listFriends === undefined) || (localStorage.me !== JSON.stringify(me))) {
-            localStorage.listFriends = '';
-            localStorage.me = JSON.stringify(me);
-        }    
-        //TODO: Если друзья уже были в массиве, то перебрать их, добавив и или удалив (сохранение порядка...). 
-    })();
+    const [meInfo] = await callAPI('users.get', {
+        name_case: 'gen',
+        v: 5.103
+    });
+    const friends = await callAPI('friends.get', {
+        user_id: meInfo.id,
+        fields: 'nickname, photo_50',
+        v: 5.103
+    });
+    
+    localStorage.me = JSON.stringify(meInfo);
+    localStorage.myFriends = JSON.stringify(friends);
+    
+    if (flag) {
+       renderLists();
+    }
+    
 }
 
 //Drug&Drop
@@ -132,7 +209,7 @@ const DragManager = new function () {
      * @param {Object} event
      */
     function onDragStart(event) {
-       
+
         if (event.which != 1) {
             return;
         }
@@ -144,9 +221,6 @@ const DragManager = new function () {
 
         dragItem.item = item;
 
-        dragItem.downX = event.pageX;
-        dragItem.downY = event.pageY;
-
         dragItem.avatar = item.cloneNode(true);
 
         listDrop.forEach((list) => {
@@ -157,7 +231,6 @@ const DragManager = new function () {
         setTimeout(function () {
             dragItem.item.innerHTML = '';
             dragItem.item.classList.add('js-card--empty');
-
         }, 0);
     }
 
@@ -170,9 +243,9 @@ const DragManager = new function () {
         event.dataTransfer.dropEffect = 'move';
         var target = event.target;
         if (target && target !== dragItem.item && target.nodeName == 'LI') {
-            this.insertBefore(dragItem.item,target);
+            this.insertBefore(dragItem.item, target);
 
-        }else if (target.nodeName == 'UL') {
+        } else if (target.nodeName == 'UL') {
             this.appendChild(dragItem.item);
         }
     }
@@ -185,34 +258,16 @@ const DragManager = new function () {
         event.preventDefault();
 
         dragItem.item.innerHTML = dragItem.avatar.innerHTML;
-
-        if (listOfAll.className == this.className) {
-            changeObject(DataModel.myFriends, dragItem.item);
-
-        }else {
-            changeObject(DataModel.listFriends, dragItem.item);
-        }
-
-       
-
         dragItem.item.classList.remove('js-card--empty');
 
-            this.removeEventListener('dragover', onDragOver, false);
-            
-            this.removeEventListener('dragend', onDragEnd, false);
+        this.removeEventListener('dragover', onDragOver, false);
+        this.removeEventListener('dragend', onDragEnd, false);
     }
 
-    function changeObject(obj, item) {
-        let nextId = '';
-        if (item.nextSibling !== null) {
-            nextId = item.nextSibling.dataset.number;
-
-        }else {
-            
-        }
-            
-        
+    function contains(arr, elem) {
+        return arr.findIndex((i) => i.id === elem) != -1;
     }
+
 
     listDrop.forEach((list) => {
         list.addEventListener('dragstart', onDragStart, false);
@@ -224,21 +279,63 @@ listDrop.forEach((list) => {
     list.onclick = changeList;
 });
 
+filterAll.oninput = searchFriends;
+filterSelected.oninput = searchFriends;
+
+
 /**
  * Функция обработчик события клика. Перехватывает нажатие на span
  * ищет целевую карточку и перемещает ее в противоположное поле
  * @param {Object} event
  */
 function changeList(event) {
-    if (event.target.nodeName === 'SPAN') {
+    if (event.target.nodeName === 'BUTTON') {
         let item = event.target.closest('.js-card');
 
         this.removeChild(item);
 
         if (listOfAll.className == this.className) {
             listOfSelected.appendChild(item);
-        }else {
+        } else {
             listOfAll.appendChild(item);
         }
     }
+}
+
+/**
+ * Функция обработчик события ввода в текстовое поле
+ * Скрывает друзей, чье имя или фамилия не содердит указанный в поле текст
+ */
+function searchFriends() {
+    let items = '';
+    for (let i = 0; i < this.classList.length; i++) {
+        if (isMatching(this.classList[i], 'filter__fueld--all')) {
+            items = listOfAll.children;
+            break;
+        }
+    }
+
+    if (items === '') {
+        items = listOfSelected.children;
+    }
+
+    for (let i = 0; i < items.length; i++) {
+        let itemName = items[i].querySelector('.item__name').textContent;
+        if (!isMatching(itemName, this.value)) {
+            items[i].style.display = 'none';
+        } else {
+            items[i].style.display = 'flex';
+        }
+    }
+
+}
+
+/**
+ * Функция ищет подстроку в строке и не чувствительна к регистру
+ * @param {string} full
+ * @param {string} chunk
+ */
+function isMatching(full, chunk) {
+    return full.toLowerCase().includes(chunk.toLowerCase());
+
 }
