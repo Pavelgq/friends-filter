@@ -18,27 +18,38 @@ renderLists();
 
     function refreshFriends() {
 
-        authorization(false);
+        authorization(false).then(() => {
+            let refFriends = JSON.parse(localStorage.myFriends);
+            let refMe = JSON.parse(localStorage.me);
+    
+            let refFriendsId = [];
+            refFriends.items.forEach(function (item) {
+                refFriendsId.push(item.id);
+            });
+    
+            for (let i = 0; i < myFriends.items.length; i++) {
+                let index = refFriendsId.indexOf(myFriends.items[i].id);
+                if (index === -1) {
+                    myFriends.items.splice(i,1);
+                } else {
+                      refFriends.items.splice(index,1);
+                      refFriendsId.splice(index,1);
+                }
+            }
 
-        let refFriends = JSON.parse(localStorage.myFriends);
-        let refMe = JSON.parse(localStorage.me);
+            for (let i = 0; i< refFriends.items.length; i++) {
+                myFriends.items.splice(myFriends.length-1, 0, refFriends.items[i]);
+            }
+            
+            myFriends.items.forEach(function (item) {
+                myFriendsId.push(item.id);
+            });
 
-        let refFriendsId = [];
-        refFriends.items.forEach(function (item) {
-            refFriendsId.push(item.id);
+            localStorage.myFriends = JSON.stringify(myFriends);
+
         });
 
-        for (let i = 0; i < myFriends.items.length; i++) {
-            let index = refFriendsId.indexOf(myFriends.items[i].id);
-            if (index === -1) {
-                delete myFriends.items[i];
-            } else {
-                delete refFriends[index];
-            }
-        }
-        myFriends.items.splice(0, 0, refFriends);
-
-        localStorage.myFriends = JSON.stringify(myFriends);
+        
     }
 
     function saveFriends() {
@@ -46,24 +57,28 @@ renderLists();
         let selected = listOfSelected.children;
         let all = listOfAll.children;
 
-
+       
         for (let i = 0; i < all.length; i++) {
             let id = all[i].dataset.number;
             let index = myFriendsId.indexOf(+id);
-            myFriends.items[index]['selected'] = null;
+            myFriends.items[index]['selectNumber'] = -1;
             newSave.push(myFriends.items[index]);
         }
         for (let i = 0; i < selected.length; i++) {
             let id = selected[i].dataset.number;
             let index = myFriendsId.indexOf(+id);
-            myFriends.items[index]['selected'] = i;
+            myFriends.items[index]['selectNumber'] = i;
             newSave.push(myFriends.items[index]);
         }
         myFriends.items = newSave;
 
+        myFriends.items.forEach(function (item) {
+            myFriendsId.push(item.id);
+        });
+
         localStorage.myFriends = JSON.stringify(myFriends);
 
-        alert('Данные сохранены')
+        alert('Данные сохранены');
     }
 
     function renderLists() {
@@ -78,7 +93,6 @@ renderLists();
         myFriends.items.forEach(function (item) {
             myFriendsId.push(item.id);
         });
-
         const headerInfo = document.querySelector('.module__title > h2');
 
         headerInfo.textContent = `Выберите друзей ${me.first_name} ${me.last_name}`;
@@ -95,8 +109,8 @@ renderLists();
         };
 
         for (let i = 0; i < myFriends.items.length; i++) {
-            if (myFriends.items[i].selected !== null && myFriends.items[i].hasOwnProperty('selected')) {
-                myFriendsSelect.items[myFriends.items[i].selected] = myFriends.items[i];
+            if (myFriends.items[i].selectNumber !== -1 && myFriends.items[i].hasOwnProperty('selectNumber')) {
+                myFriendsSelect.items[myFriends.items[i].selectNumber] = myFriends.items[i];
 
             } else {
                 myFriendsAll.items.push(myFriends.items[i]);
