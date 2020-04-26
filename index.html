@@ -30,15 +30,7 @@
                     <h3>Ваши друзья</h3>
                 </div>
                 <ul class="module__list module__list--all">
-                    <script class="module__friends" type="text/x-handlebars-template">
-                        {{#each items}}
-                        <li class="item js-card" draggable="true">
-                            <div class="item__wrapper" draggable="false"><img class="item__image" src="{{photo_50}}" alt="" srcset="" ></div>
-                            <div class="item__name">{{first_name}} {{last_name}}</div>
-                            <span class="item__button add-button icon"></span>
-                        </li>
-                        {{/each}}
-                    </script>
+                    
                 </ul>
             </div>
             
@@ -57,13 +49,21 @@
                 </ul>
             </div>
             <div class="module__action">
+                <button type="button" class="module__button ref-button">Обновить список</button>
                 <button type="button" class="module__button save-button">Сохранить</button>
             </div>
         </section>
-
+        <script class="module__friends" type="text/x-handlebars-template">
+            {{#each items}}
+            <li class="item js-card" data-number="{{id}}" draggable="true">
+                <div class="item__wrapper" draggable="false"><img class="item__image" src="{{photo_50}}" alt="" srcset="" ></div>
+                <div class="item__name">{{first_name}} {{last_name}}</div>
+                <button class="item__button add-button icon"></button>
+            </li>
+            {{/each}}
+        </script>
     </main>
 
     <script src="src/action.js"></script>
-    <script type="module" src="src/dragAndDrop.js"></script>
 </body>
 </html>
