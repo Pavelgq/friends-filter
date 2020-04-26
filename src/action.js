@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 const listOfAll = document.querySelector('.module__list--all');
 const listOfSelected = document.querySelector('.module__list--selected');
 const listDrop = document.querySelectorAll('.module__list');
@@ -14,63 +12,34 @@ let myFriends,
     me = [];
 let myFriendsId = [];
 
-renderLists();
 
-    function refreshFriends() {
+/**
+ * Функция обновляет друзей сравнивая новые данные с сервера
+ * с теми данными, что уже есть. Не меняет порядок и положение карточек
+ */
+function refreshFriends() {
 
-        authorization(false).then(() => {
-            let refFriends = JSON.parse(localStorage.myFriends);
-            let refMe = JSON.parse(localStorage.me);
-    
-            let refFriendsId = [];
-            refFriends.items.forEach(function (item) {
-                refFriendsId.push(item.id);
-            });
-    
-            for (let i = 0; i < myFriends.items.length; i++) {
-                let index = refFriendsId.indexOf(myFriends.items[i].id);
-                if (index === -1) {
-                    myFriends.items.splice(i,1);
-                } else {
-                      refFriends.items.splice(index,1);
-                      refFriendsId.splice(index,1);
-                }
-            }
+    authorization(false).then(() => {
+        let refFriends = JSON.parse(localStorage.myFriends);
+        let refFriendsId = [];
 
-            for (let i = 0; i< refFriends.items.length; i++) {
-                myFriends.items.splice(myFriends.length-1, 0, refFriends.items[i]);
-            }
-            
-            myFriends.items.forEach(function (item) {
-                myFriendsId.push(item.id);
-            });
-
-            localStorage.myFriends = JSON.stringify(myFriends);
-
+        refFriends.items.forEach(function (item) {
+            refFriendsId.push(item.id);
         });
 
-        
-    }
-
-    function saveFriends() {
-        let newSave = [];
-        let selected = listOfSelected.children;
-        let all = listOfAll.children;
-
-       
-        for (let i = 0; i < all.length; i++) {
-            let id = all[i].dataset.number;
-            let index = myFriendsId.indexOf(+id);
-            myFriends.items[index]['selectNumber'] = -1;
-            newSave.push(myFriends.items[index]);
+        for (let i = 0; i < myFriends.items.length; i++) {
+            let index = refFriendsId.indexOf(myFriends.items[i].id);
+            if (index === -1) {
+                myFriends.items.splice(i, 1);
+            } else {
+                refFriends.items.splice(index, 1);
+                refFriendsId.splice(index, 1);
+            }
         }
-        for (let i = 0; i < selected.length; i++) {
-            let id = selected[i].dataset.number;
-            let index = myFriendsId.indexOf(+id);
-            myFriends.items[index]['selectNumber'] = i;
-            newSave.push(myFriends.items[index]);
+
+        for (let i = 0; i < refFriends.items.length; i++) {
+            myFriends.items.splice(myFriends.length - 1, 0, refFriends.items[i]);
         }
-        myFriends.items = newSave;
 
         myFriends.items.forEach(function (item) {
             myFriendsId.push(item.id);
@@ -78,72 +47,92 @@ renderLists();
 
         localStorage.myFriends = JSON.stringify(myFriends);
 
-        alert('Данные сохранены');
-    }
-
-    function renderLists() {
-        if (localStorage.myFriends !== undefined) {
-            myFriends = JSON.parse(localStorage.myFriends);
-            me = JSON.parse(localStorage.me);
-        }else {
-            authorization(true);
-            return 0;
-        }
-
-        myFriends.items.forEach(function (item) {
-            myFriendsId.push(item.id);
-        });
-        const headerInfo = document.querySelector('.module__title > h2');
-
-        headerInfo.textContent = `Выберите друзей ${me.first_name} ${me.last_name}`;
-
-        const template = document.querySelector('.module__friends').textContent;
-        const render = Handlebars.compile(template);
-
-        let myFriendsSelect = {
-            items: []
-        };
-
-        let myFriendsAll = {
-            items: []
-        };
-
-        for (let i = 0; i < myFriends.items.length; i++) {
-            if (myFriends.items[i].selectNumber !== -1 && myFriends.items[i].hasOwnProperty('selectNumber')) {
-                myFriendsSelect.items[myFriends.items[i].selectNumber] = myFriends.items[i];
-
-            } else {
-                myFriendsAll.items.push(myFriends.items[i]);
-            }
-        }
-
-
-        const htmlFriend = render(myFriendsAll);
-        const htmlSecected = render(myFriendsSelect);
-        listOfAll.innerHTML = htmlFriend;
-        listOfSelected.innerHTML = htmlSecected;
-    }
-
-    refButton.onclick = refreshFriends;
-    saveButton.onclick = saveFriends;
-
-
-function copy(arr) {
-    if (arr.length) {
-        var arr1 = [];
-    } else if (typeof arr == "object") {
-        var arr1 = {};
-    } else {
-        return arr;
-    }
-    for (let key in arr) {
-        if (typeof arr[key] == "function" || !arr[key].length || typeof arr[key] != "object")
-            arr1[key] = arr[key];
-        else
-            arr1[key] = copy(arr[key]);
-    }
-    return arr1;
+    });
 }
+
+/**
+ * Функция сохраняет изменения
+ * Выбранных друзей и измененный порядок
+ */
+function saveFriends() {
+    let newSave = [];
+    let selected = listOfSelected.children;
+    let all = listOfAll.children;
+
+
+    for (let i = 0; i < all.length; i++) {
+        let id = all[i].dataset.number;
+        let index = myFriendsId.indexOf(+id);
+        myFriends.items[index]['selectNumber'] = -1;
+        newSave.push(myFriends.items[index]);
+    }
+    for (let i = 0; i < selected.length; i++) {
+        let id = selected[i].dataset.number;
+        let index = myFriendsId.indexOf(+id);
+        myFriends.items[index]['selectNumber'] = i;
+        newSave.push(myFriends.items[index]);
+    }
+    myFriends.items = newSave;
+
+    myFriends.items.forEach(function (item) {
+        myFriendsId.push(item.id);
+    });
+
+    localStorage.myFriends = JSON.stringify(myFriends);
+
+    alert('Данные сохранены');
+}
+
+/**
+ * Функция преобразует данные в html-карточки и добавляет в колонку
+ */
+function renderLists() {
+    if (localStorage.myFriends !== undefined) {
+        myFriends = JSON.parse(localStorage.myFriends);
+        me = JSON.parse(localStorage.me);
+    } else {
+        authorization(true);
+        return 0;
+    }
+
+    myFriends.items.forEach(function (item) {
+        myFriendsId.push(item.id);
+    });
+    const headerInfo = document.querySelector('.module__title > h2');
+
+    headerInfo.textContent = `Выберите друзей ${me.first_name} ${me.last_name}`;
+
+    const template = document.querySelector('.module__friends').textContent;
+    const render = Handlebars.compile(template);
+
+    let myFriendsSelect = {
+        items: []
+    };
+
+    let myFriendsAll = {
+        items: []
+    };
+
+    for (let i = 0; i < myFriends.items.length; i++) {
+        if (myFriends.items[i].selectNumber !== -1 && myFriends.items[i].hasOwnProperty('selectNumber')) {
+            myFriendsSelect.items[myFriends.items[i].selectNumber] = myFriends.items[i];
+
+        } else {
+            myFriendsAll.items.push(myFriends.items[i]);
+        }
+    }
+
+
+    const htmlFriend = render(myFriendsAll);
+    const htmlSecected = render(myFriendsSelect);
+    listOfAll.innerHTML = htmlFriend;
+    listOfSelected.innerHTML = htmlSecected;
+}
+
+renderLists();
+refButton.onclick = refreshFriends;
+saveButton.onclick = saveFriends;
+
 
 //API VK 
 
@@ -170,7 +159,7 @@ async function authorization(flag) {
         });
 
     }
-   
+
     /**
      * Вызов VK API
      * @param {string} method
@@ -200,14 +189,14 @@ async function authorization(flag) {
         fields: 'nickname, photo_50',
         v: 5.103
     });
-    
+
     localStorage.me = JSON.stringify(meInfo);
     localStorage.myFriends = JSON.stringify(friends);
-    
+
     if (flag) {
-       renderLists();
+        renderLists();
     }
-    
+
 }
 
 //Drug&Drop
